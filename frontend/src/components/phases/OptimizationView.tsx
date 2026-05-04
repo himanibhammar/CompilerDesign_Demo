@@ -11,28 +11,38 @@ export const OptimizationView = ({ ir, optimized }: { ir: CompilerData['ir'], op
       <div className="space-y-1 p-4 font-mono text-sm">
         {code.map((instr, i) => {
           let display = '';
-          const { op, arg1, arg2, result } = instr;
+          let isLabel = false;
+          let isComment = false;
           
-          if (op === '=') display = `${result} = ${arg1}`;
-          else if (['+', '-', '*', '/', '==', '!=', '<', '>', '<=', '>=', '&&', '||'].includes(op)) {
-            display = `${result} = ${arg1} ${op} ${arg2}`;
-          } else if (op === 'if_false') display = `if false ${arg1} goto ${result}`;
-          else if (op === 'goto') display = `goto ${result}`;
-          else if (op === 'label') display = `${result}:`;
-          else if (op === 'print') display = `print ${arg1}`;
-          else if (op === 'return') display = `return ${arg1}`;
-          else if (op === 'ERROR') display = `ERROR: ${arg1}`;
-          else display = `${op} ${arg1} ${arg2} ${result}`;
+          if (typeof instr === 'string') {
+              display = instr;
+              if (display.endsWith(':')) isLabel = true;
+              if (display.startsWith(';')) isComment = true;
+          } else {
+              const { op, arg1, arg2, result } = instr;
+              if (op === '=') display = `${result} = ${arg1}`;
+              else if (['+', '-', '*', '/', '==', '!=', '<', '>', '<=', '>=', '&&', '||'].includes(op)) {
+                display = `${result} = ${arg1} ${op} ${arg2}`;
+              } else if (op === 'if_false') display = `if false ${arg1} goto ${result}`;
+              else if (op === 'goto') display = `goto ${result}`;
+              else if (op === 'label') { display = `${result}:`; isLabel = true; }
+              else if (op === 'print') display = `print ${arg1}`;
+              else if (op === 'return') display = `return ${arg1}`;
+              else if (op === 'ERROR') display = `ERROR: ${arg1}`;
+              else display = `${op} ${arg1} ${arg2} ${result}`;
+          }
 
           return (
             <div 
               key={i}
-              className={`py-1 px-2 rounded flex items-center ${
-                op === 'label' ? 'font-bold text-yellow-300 mt-2' : 'text-slate-300 ml-4'
+              className={`py-1 px-2 rounded flex items-start ${
+                isLabel || isComment ? 'mt-2' : ''
               }`}
             >
-              <span className="w-6 text-slate-600 text-xs select-none">{i + 1}</span>
-              <span>{display}</span>
+              <span className="w-8 shrink-0 text-slate-500 text-xs select-none mt-0.5 text-right pr-3">{i + 1}</span>
+              <span className={`whitespace-pre ${
+                isLabel ? 'font-bold text-yellow-300' : isComment ? 'text-gray-400 italic ml-4' : 'text-slate-300 ml-4'
+              }`}>{display}</span>
             </div>
           );
         })}

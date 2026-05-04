@@ -38,11 +38,13 @@ export const CodeGenView = ({ target }: { target: CompilerData['target'] }) => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
                     key={i} 
-                    className="flex"
+                    className="flex items-start"
                   >
-                    <span className="w-8 text-[#86efac]/50 select-none text-right pr-4">{i + 1}</span>
+                    <span className="w-8 shrink-0 text-[#86efac]/50 select-none text-right pr-4 mt-0.5">{i + 1}</span>
                     {isLabel ? (
                       <span className="text-[#fde047] font-bold">{instr}</span>
+                    ) : instr.startsWith(';') ? (
+                      <span className="text-gray-400 italic whitespace-pre ml-4">{instr}</span>
                     ) : (
                       <div className="ml-4">
                         <span className="text-[#86efac] font-bold w-12 inline-block">{op}</span>
